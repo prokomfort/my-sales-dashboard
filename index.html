@@ -8,99 +8,28 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         
-        /* Адаптация под Full HD (1920x1080) */
-        html, body { 
-            height: 100%;
-            overflow: hidden; 
-        }
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #0f1115; 
-            color: #e2e8f0; 
-            margin: 0; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem; 
-        }
-
-        .max-w-custom {
-            width: 100%;
-            max-width: 1800px; /* Растягиваем под 1920 с учетом отступов */
-            max-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem; 
-        }
-
+        html, body { height: 100%; overflow: hidden; zoom: 0.95; }
+        body { font-family: 'Inter', sans-serif; background-color: #0f1115; color: #e2e8f0; margin: 0; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .max-w-custom { width: 95vw; aspect-ratio: 5 / 4; max-height: 95vh; display: flex; flex-direction: column; gap: 1.25rem; }
         .glass-card { background: rgba(30, 35, 45, 0.7); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 20px; }
         .progress-ring { transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%; }
         .stat-value { background: linear-gradient(180deg, #fff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0f1115; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        
         .glow-ring { filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.6)); }
         .glow-orange { filter: drop-shadow(0 0 7px rgba(249, 115, 22, 0.8)); }
-
-        .vacation-badge {
-            background-color: #2a1f1a;
-            border: 1px solid #7c4a2a;
-            border-radius: 16px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 160px; 
-            height: 125px; 
-        }
-
-        .chart-container { 
-            position: relative; 
-            width: 100%; 
-            height: 420px; /* Увеличено для 1920 */
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-
+        .vacation-badge { background-color: #2a1f1a; border: 1px solid #7c4a2a; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 140px; height: 110px; }
+        .chart-container { position: relative; width: 100%; height: 350px; display: flex; align-items: center; justify-content: center; }
         .sector-path { transition: all 0.5s ease-out; cursor: pointer; }
-        .sector-path:hover { filter: brightness(1.3) !important; }
-
-        .chart-label-name { 
-            font-size: 11px; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            fill: white; 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8); 
-            pointer-events: none;
-        }
-        
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        
         .calendar-day { font-size: 14px; padding: 4px; text-align: center; border-radius: 6px; }
-        
-        .today { background: #3b82f6; color: white; font-weight: bold; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
-        .weekend { color: #ff3b5c; opacity: 1; font-weight: 600; } 
-
-        table thead th { position: sticky; top: 0; background: #1e232d; z-index: 10; }
+        .today { background: #3b82f6; color: white; font-weight: bold; }
+        .weekend { color: #ff3b5c; font-weight: 600; } 
         .table-container { flex: 1; overflow-y: hidden; }
-
-        /* Масштабированные шрифты для 1920 */
         .table-header-text { font-size: 14px; } 
-        .table-body-text { font-size: 20px; }      
-        .table-badge-text { font-size: 13px; }     
-        .table-mono-text { font-size: 20px; }      
-        .table-cell-padding { padding: 1.25rem 1.5rem; } 
-
-        .manager-name-text { font-size: 18px; }       
-        .manager-fact-text { font-size: 32px; }       
-        .manager-comm-label { font-size: 14px; }    
-        .manager-comm-value { font-size: 18px; }    
-        .manager-percent-center { font-size: 28px; }  
+        .table-body-text { font-size: 18px; }      
+        .table-cell-padding { padding: 0.75rem 1.25rem; } 
+        .manager-name-text { font-size: 16px; }       
+        .manager-fact-text { font-size: 28px; }       
+        .manager-percent-center { font-size: 24px; }  
     </style>
 </head>
 <body>
@@ -156,15 +85,14 @@
             </div>
         </div>
 
-        <!-- КАРТОЧКИ МЕНЕДЖЕРОВ -->
-        <div id="managers-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5"></div>
+        <!-- Сетка сотрудников (8 человек) -->
+        <div id="managers-grid" class="grid grid-cols-4 md:grid-cols-8 gap-3"></div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full min-h-0">
-            <!-- БЛОК ДЕТАЛИЗАЦИИ -->
             <div class="lg:col-span-2 glass-card overflow-hidden flex flex-col">
                 <div class="px-6 py-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
                     <h3 class="font-semibold text-xl text-white">Детализация по сотрудникам</h3>
-                    <span class="table-badge-text text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-4 py-1.5 rounded">Рейтинг по факту продаж</span>
+                    <span class="text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-4 py-1.5 rounded text-xs">Рейтинг по факту продаж</span>
                 </div>
                 <div class="table-container">
                     <table class="w-full text-left border-collapse">
@@ -183,7 +111,6 @@
                     </table>
                 </div>
             </div>
-
             <div class="glass-card p-6 flex flex-col justify-center">
                 <h3 class="font-semibold text-lg mb-4 text-center text-white">Доля в результате</h3>
                 <div id="radial-chart-box" class="chart-container"></div>
@@ -192,49 +119,61 @@
     </div>
 
     <script>
-        const TEAM_PLAN = 2500000; 
-        const CALENDAR = { totalDays: 19, daysLeft: 12 };
-        const passedDays = Math.max(1, CALENDAR.totalDays - CALENDAR.daysLeft);
+        /**
+         * БЛОК ДАННЫХ ДЛЯ РЕДАКТИРОВАНИЯ
+         * Просто меняйте значения ниже в кавычках и цифрах
+         */
+        const CONFIG = {
+            teamPlan: 15000000, // Общий план команды
+            totalWorkingDays: 22, // Всего рабочих дней в месяце
+            daysRemaining: 10,    // Осталось рабочих дней
+            
+            managers: [
+                { name: "Иван Иванов", plan: 2500000, fact: 1800000, vacation: false },
+                { name: "Анна Смирнова", plan: 2500000, fact: 2650000, vacation: false },
+                { name: "Петр Петров", plan: 2000000, fact: 500000, vacation: true },
+                { name: "Елена Кузнецова", plan: 2000000, fact: 1950000, vacation: false },
+                { name: "Максим Орлов", plan: 1500000, fact: 1200000, vacation: false },
+                { name: "Ольга Соколова", plan: 1500000, fact: 800000, vacation: false },
+                { name: "Дмитрий Волков", plan: 1500000, fact: 1450000, vacation: false },
+                { name: "Марина Морозова", plan: 1500000, fact: 1100000, vacation: false }
+            ]
+        };
 
-        const dashboardData = [
-            { name: 'Озимук',      plan: 350000, fact: 319000, onVacation: false },
-            { name: 'Крутовская',  plan: 250000, fact: 220000, onVacation: true   }, 
-            { name: 'Паренко',     plan: 250000, fact: 47000,  onVacation: false }, 
-            { name: 'Бабаев',      plan: 250000, fact: 131000, onVacation: false }, 
-            { name: 'Злобин',      plan: 250000, fact: 68000,  onVacation: false }, 
-            { name: 'Остапенко',   plan: 350000, fact: 155000, onVacation: false }
-        ];
-
-        const RADIAL_PALETTE = ['#06b6d4', '#10b981', '#0891b2', '#14b8a6', '#0ea5e9', '#4f46e5'];
+        const RADIAL_PALETTE = ['#06b6d4', '#10b981', '#0891b2', '#14b8a6', '#0ea5e9', '#4f46e5', '#8b5cf6', '#ec4899'];
 
         function initCalendar() {
             const now = new Date();
             const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-            document.getElementById('current-month').innerText = monthNames[now.getMonth()];
+            const monthHeader = document.getElementById('current-month');
+            if (monthHeader) monthHeader.innerText = monthNames[now.getMonth()];
+            
             const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
             const startOffset = firstDay === 0 ? 6 : firstDay - 1;
             const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
             const calendarBody = document.getElementById('calendar-body');
-            calendarBody.innerHTML = '';
-            for (let i = 0; i < startOffset; i++) calendarBody.appendChild(document.createElement('div'));
-            for (let d = 1; d <= daysInMonth; d++) {
-                const dayEl = document.createElement('div');
-                dayEl.innerText = d;
-                const dw = new Date(now.getFullYear(), now.getMonth(), d).getDay();
-                dayEl.className = `calendar-day ${d === now.getDate() ? 'today' : ''} ${dw === 0 || dw === 6 ? 'weekend' : ''}`;
-                calendarBody.appendChild(dayEl);
+            
+            if (calendarBody) {
+                calendarBody.innerHTML = '';
+                for (let i = 0; i < startOffset; i++) calendarBody.appendChild(document.createElement('div'));
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dayEl = document.createElement('div');
+                    dayEl.innerText = d;
+                    const dw = new Date(now.getFullYear(), now.getMonth(), d).getDay();
+                    dayEl.className = `calendar-day ${d === now.getDate() ? 'today' : ''} ${dw === 0 || dw === 6 ? 'weekend' : ''}`;
+                    calendarBody.appendChild(dayEl);
+                }
             }
         }
 
         function renderRadialChart() {
             const container = document.getElementById('radial-chart-box');
-            const sorted = [...dashboardData].sort((a,b) => b.fact - a.fact);
-            const totalFact = sorted.reduce((acc, m) => acc + m.fact, 0);
+            if (!container) return;
             
-            const size = 400; /* Увеличен размер круговой диаграммы */
-            const center = size / 2;
-            const innerRadius = 60;
-            const maxRadius = 200;
+            const sorted = [...CONFIG.managers].sort((a,b) => b.fact - a.fact);
+            const totalFact = sorted.reduce((acc, m) => acc + m.fact, 0);
+            const size = 340; const center = size / 2;
+            const innerRadius = 45; const maxRadius = 160;
             
             let svgHtml = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="overflow: visible;">`;
             let currentAngle = -Math.PI / 2;
@@ -244,7 +183,7 @@
                 const share = m.fact / totalFact;
                 const angleSpan = share * Math.PI * 2;
                 const midAngle = currentAngle + angleSpan / 2;
-                const currentRadius = innerRadius + (maxRadius - innerRadius) * (m.fact / sorted[0].fact);
+                const currentRadius = innerRadius + (maxRadius - innerRadius) * (m.fact / (sorted[0].fact || 1));
                 const color = RADIAL_PALETTE[i % RADIAL_PALETTE.length];
                 
                 const x1 = center + innerRadius * Math.cos(currentAngle);
@@ -255,152 +194,87 @@
                 const y3 = center + currentRadius * Math.sin(currentAngle + angleSpan);
                 const x4 = center + innerRadius * Math.cos(currentAngle + angleSpan);
                 const y4 = center + innerRadius * Math.sin(currentAngle + angleSpan);
-                
                 const largeArc = angleSpan > Math.PI ? 1 : 0;
                 
-                svgHtml += `<path d="M ${x1} ${y1} L ${x2} ${y2} A ${currentRadius} ${currentRadius} 0 ${largeArc} 1 ${x3} ${y3} L ${x4} ${y4} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x1} ${y1}" 
-                                  fill="${color}" opacity="0.9" stroke="#0f1115" stroke-width="1" class="sector-path">
-                                  <title>${m.name}: ${m.fact.toLocaleString()} RUB</title>
-                            </path>`;
+                svgHtml += `<path d="M ${x1} ${y1} L ${x2} ${y2} A ${currentRadius} ${currentRadius} 0 ${largeArc} 1 ${x3} ${y3} L ${x4} ${y4} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x1} ${y1}" fill="${color}" opacity="0.9" stroke="#0f1115" class="sector-path"></path>`;
                 
-                if (i < 4) {
-                   const labelRadius = innerRadius + (currentRadius - innerRadius) * 0.5;
+                if (share > 0.04) {
+                   const labelRadius = innerRadius + (currentRadius - innerRadius) * 0.6;
                    const tx = center + labelRadius * Math.cos(midAngle);
                    const ty = center + labelRadius * Math.sin(midAngle);
                    let rot = (midAngle * 180 / Math.PI) + 90;
                    if (rot > 90 && rot < 270) rot += 180;
-                   svgHtml += `<g transform="translate(${tx}, ${ty}) rotate(${rot})">
-                                 <text text-anchor="middle" class="chart-label-name" y="3">${m.name}</text>
-                               </g>`;
+                   svgHtml += `<g transform="translate(${tx}, ${ty}) rotate(${rot})"><text text-anchor="middle" y="3" style="font-size: 9px; fill: white; font-weight: bold; text-transform: uppercase;">${m.name.split(' ')[0]}</text></g>`;
                 }
                 currentAngle += angleSpan;
             });
-            
-            svgHtml += `<circle cx="${center}" cy="${center}" r="${innerRadius-10}" fill="#161b22" />`;
-            svgHtml += `</svg>`;
+            svgHtml += `<circle cx="${center}" cy="${center}" r="${innerRadius-10}" fill="#161b22" /></svg>`;
             container.innerHTML = svgHtml;
         }
 
         function updateUI() {
             initCalendar();
-            
-            const totalFactTeam = dashboardData.reduce((acc, m) => acc + m.fact, 0);
-            const teamPlanAchieved = totalFactTeam >= TEAM_PLAN;
+            const totalFactTeam = CONFIG.managers.reduce((acc, m) => acc + m.fact, 0);
+            const passedDays = Math.max(1, CONFIG.totalWorkingDays - CONFIG.daysRemaining);
+            const teamPlanAchieved = totalFactTeam >= CONFIG.teamPlan;
 
             const grid = document.getElementById('managers-grid');
-            grid.innerHTML = '';
-            dashboardData.forEach(m => {
-                const percent = m.plan > 0 ? Math.round((m.fact / m.plan) * 100) : 0;
-                let commissionRate = 8;
-                let commissionColor = "text-slate-300";
-                let ringGlowClass = "text-sky-500";
-                let ringStroke = "currentColor";
-                
-                if (!m.onVacation) {
-                    if (percent >= 150 && teamPlanAchieved) {
-                        commissionRate = 11;
-                        commissionColor = "text-orange-500 font-bold";
-                        ringGlowClass = "text-orange-500 glow-orange";
-                        ringStroke = "#f97316";
-                    } else if (percent >= 100) {
-                        commissionRate = 10;
-                        commissionColor = "text-emerald-400 font-bold";
-                        ringGlowClass = "text-emerald-400 glow-ring";
-                        ringStroke = "currentColor";
-                    } else {
-                        commissionRate = 8;
-                        commissionColor = "text-sky-400";
-                        ringGlowClass = "text-sky-500";
-                        ringStroke = "currentColor";
+            if (grid) {
+                grid.innerHTML = '';
+                CONFIG.managers.forEach(m => {
+                    const percent = m.plan > 0 ? Math.round((m.fact / m.plan) * 100) : 0;
+                    let commissionRate = 8, commissionColor = "text-slate-300", ringGlow = "text-sky-500", ringStroke = "currentColor";
+                    if (!m.vacation) {
+                        if (percent >= 150 && teamPlanAchieved) { 
+                            commissionRate = 11; commissionColor = "text-orange-500 font-bold"; ringGlow = "text-orange-500 glow-orange"; ringStroke = "#f97316"; 
+                        } else if (percent >= 100) { 
+                            commissionRate = 10; commissionColor = "text-emerald-400 font-bold"; ringGlow = "text-emerald-400 glow-ring"; 
+                        } else { 
+                            commissionRate = 8; commissionColor = "text-sky-400"; 
+                        }
                     }
-                }
-
-                const card = document.createElement('div');
-                card.className = 'glass-card p-6 flex flex-col items-center text-center hover:scale-[1.02] transition-transform';
-                
-                let mainGraphic = m.onVacation ? `
-                    <div class="vacation-badge mb-5">
-                        <span class="text-[#7c4a2a] text-[13px] font-bold uppercase mb-1">Статус</span>
-                        <span class="text-[#d97706] text-3xl font-black uppercase leading-none">Отпуск</span>
-                        <span class="text-[#d97706] text-4xl font-black mt-2">8%</span>
-                    </div>
-                ` : `
-                    <div class="relative mb-5 flex items-center justify-center">
-                        <svg width="140" height="140"><circle class="text-slate-800" stroke-width="10" stroke="currentColor" fill="transparent" r="62" cx="70" cy="70"/>
-                        <circle class="progress-ring ${ringGlowClass}" stroke-width="10" stroke-dasharray="389" stroke-dashoffset="${389 - (Math.min(percent, 100)/100)*389}" stroke-linecap="round" stroke="${ringStroke}" fill="transparent" r="62" cx="70" cy="70"/></svg>
-                        <span class="absolute manager-percent-center font-extrabold text-white">${percent}%</span>
-                    </div>
-                `;
-                
-                const commissionSlot = m.onVacation ? 
-                    `<div class="mt-1 h-[30px] w-full"></div>` : 
-                    `<div class="mt-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10">
-                        <span class="manager-comm-label uppercase text-slate-400 mr-1">% от продаж:</span>
-                        <span class="manager-comm-value ${commissionColor}">${commissionRate}%</span>
-                    </div>`;
-
-                card.innerHTML = `
-                    ${mainGraphic}
-                    <div class="manager-name-text font-bold text-slate-300 uppercase mb-1 tracking-wide">${m.name}</div>
-                    <div class="manager-fact-text font-black text-white">${(m.fact / 1000).toFixed(0)}к</div>
-                    ${commissionSlot}
-                `;
-                grid.appendChild(card);
-            });
+                    const card = document.createElement('div');
+                    card.className = 'glass-card p-3 py-4 flex flex-col items-center text-center';
+                    card.innerHTML = m.vacation ? `
+                        <div class="vacation-badge mb-3"><span class="text-[#7c4a2a] text-[10px] font-bold uppercase">Статус</span><span class="text-[#d97706] text-xl font-black uppercase leading-tight">Отпуск</span><span class="text-[#d97706] text-2xl font-black mt-1">8%</span></div>
+                        <div class="manager-name-text font-bold text-slate-300 uppercase truncate w-full">${m.name.split(' ')[0]}</div><div class="manager-fact-text font-black text-white leading-none">${(m.fact / 1000).toFixed(0)}к</div>
+                    ` : `
+                        <div class="relative mb-3 flex items-center justify-center"><svg width="100" height="100"><circle class="text-slate-800" stroke-width="7" stroke="currentColor" fill="transparent" r="44" cx="50" cy="50"/><circle class="progress-ring ${ringGlow}" stroke-width="7" stroke-dasharray="276" stroke-dashoffset="${276 - (Math.min(percent, 100)/100)*276}" stroke-linecap="round" stroke="${ringStroke}" fill="transparent" r="44" cx="50" cy="50"/></svg><span class="absolute manager-percent-center font-extrabold text-white">${percent}%</span></div>
+                        <div class="manager-name-text font-bold text-slate-300 uppercase truncate w-full">${m.name.split(' ')[0]}</div><div class="manager-fact-text font-black text-white leading-none">${(m.fact / 1000).toFixed(0)}к</div>
+                        <div class="mt-2 px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px]"><span class="${commissionColor}">${commissionRate}%</span></div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
 
             const tableBody = document.getElementById('table-body');
-            tableBody.innerHTML = '';
-            let totalFactSum = 0;
-            let displayIndex = 1; 
-            
-            [...dashboardData].sort((a,b) => b.fact-a.fact).forEach((m) => {
-                if (m.onVacation && m.name === 'Крутовская') {
-                    totalFactSum += m.fact; 
-                    return;
-                }
+            if (tableBody) {
+                tableBody.innerHTML = '';
+                let displayIndex = 1;
+                [...CONFIG.managers].sort((a,b) => b.fact-a.fact).forEach((m) => {
+                    const percent = m.plan > 0 ? Math.round((m.fact / m.plan) * 100) : 0;
+                    const rem = m.plan - m.fact;
+                    const pd = Math.round(m.plan / (CONFIG.totalWorkingDays || 1));
+                    const fd = Math.round(m.fact / passedDays);
+                    const row = document.createElement('tr');
+                    row.className = `border-b border-white/5 hover:bg-white/5 transition-colors`;
+                    row.innerHTML = `<td class="table-cell-padding text-center font-mono text-slate-500 text-sm">${displayIndex++}</td><td class="table-cell-padding font-semibold text-slate-100">${m.name}</td><td class="table-cell-padding text-right text-slate-300 font-mono">${m.plan.toLocaleString()}</td><td class="table-cell-padding text-right text-slate-400 font-mono text-sm">${pd.toLocaleString()}</td><td class="table-cell-padding text-right ${fd < pd ? 'text-sky-400' : 'text-emerald-400'} font-bold">${fd.toLocaleString()}</td><td class="table-cell-padding text-right"><div class="font-bold ${percent >= 100 ? 'text-emerald-400' : 'text-white'}">${m.fact.toLocaleString()}</div><div class="w-full h-1 bg-slate-800 rounded-full mt-1.5 overflow-hidden"><div class="h-full bg-emerald-500" style="width: ${Math.min(percent, 100)}%"></div></div></td><td class="table-cell-padding text-right font-mono text-sm">${rem <= 0 ? `<div class="text-emerald-400 font-bold">ВЫПОЛНЕНО</div>` : `<span class="text-slate-300">${rem.toLocaleString()}</span>`}</td>`;
+                    tableBody.appendChild(row);
+                });
+            }
 
-                const percent = m.plan > 0 ? Math.round((m.fact / m.plan) * 100) : 0;
-                const rem = m.plan - m.fact;
-                const pd = m.plan > 0 ? Math.round(m.plan / CALENDAR.totalDays) : 0;
-                const fd = Math.round(m.fact / passedDays);
-                
-                const row = document.createElement('tr');
-                row.className = `border-b border-white/5 hover:bg-white/5 transition-colors`;
-                
-                row.innerHTML = `
-                    <td class="table-cell-padding text-center font-mono text-slate-500">${displayIndex++}</td>
-                    <td class="table-cell-padding font-semibold text-slate-100">${m.name}</td>
-                    <td class="table-cell-padding text-right text-slate-300 font-mono">${m.plan.toLocaleString()}</td>
-                    <td class="table-cell-padding text-right text-slate-400 font-mono">${pd.toLocaleString()}</td>
-                    <td class="table-cell-padding text-right ${fd < pd ? 'text-sky-400' : 'text-emerald-400'} font-bold">${fd.toLocaleString()}</td>
-                    <td class="table-cell-padding text-right">
-                        <div class="font-bold ${percent >= 100 ? 'text-emerald-400' : 'text-white'}">${m.fact.toLocaleString()}</div>
-                        <div class="w-full h-1.5 bg-slate-800 rounded-full mt-2 overflow-hidden"><div class="h-full bg-emerald-500" style="width: ${Math.min(percent, 100)}%"></div></div>
-                    </td>
-                    <td class="table-cell-padding text-right font-mono table-mono-text">
-                        ${rem <= 0 ? 
-                            `<div class="text-emerald-400 font-bold brightness-125 leading-tight text-[20px]">ВЫПОЛНЕНО</div>
-                             <div class="text-emerald-400/60 text-[18px] mt-0.5">(+${Math.abs(rem).toLocaleString()})</div>` : 
-                            `<span class="text-slate-300">${rem.toLocaleString()}</span>`
-                        }
-                    </td>
-                `;
-                tableBody.appendChild(row);
-                totalFactSum += m.fact;
-            });
-
-            const totalPercent = Math.round((totalFactSum / TEAM_PLAN) * 100);
-            document.getElementById('header-total-plan').innerText = (TEAM_PLAN / 1000000).toFixed(1) + 'M';
-            document.getElementById('header-total-fact').innerText = (totalFactSum / 1000000).toFixed(1) + 'M';
+            const totalPercent = CONFIG.teamPlan > 0 ? Math.round((totalFactTeam / CONFIG.teamPlan) * 100) : 0;
+            document.getElementById('header-total-plan').innerText = (CONFIG.teamPlan / 1000000).toFixed(1) + 'M';
+            document.getElementById('header-total-fact').innerText = (totalFactTeam / 1000000).toFixed(1) + 'M';
             document.getElementById('header-total-percent').innerText = totalPercent + '%';
-            document.getElementById('header-plan-label').innerText = (TEAM_PLAN / 1000000).toFixed(1) + 'M';
-            setTimeout(() => { document.getElementById('header-progress-bar').style.width = Math.min(totalPercent, 100) + '%'; }, 100);
-            document.getElementById('days-total').innerText = CALENDAR.totalDays;
-            document.getElementById('days-left').innerText = CALENDAR.daysLeft;
+            document.getElementById('header-plan-label').innerText = (CONFIG.teamPlan / 1000000).toFixed(1) + 'M';
+            document.getElementById('header-progress-bar').style.width = Math.min(totalPercent, 100) + '%';
+            document.getElementById('days-total').innerText = CONFIG.totalWorkingDays;
+            document.getElementById('days-left').innerText = CONFIG.daysRemaining;
             renderRadialChart();
         }
 
-        window.addEventListener('load', () => setTimeout(updateUI, 300));
+        window.onload = updateUI;
     </script>
 </body>
 </html>
