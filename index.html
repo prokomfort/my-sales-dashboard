@@ -3,42 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executive Sales Dashboard Live</title>
+    <title>Executive Sales Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         
-        html, body { height: 100%; overflow: hidden; zoom: 0.95; }
-        body { font-family: 'Inter', sans-serif; background-color: #0f1115; color: #e2e8f0; margin: 0; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-        .max-w-custom { width: 95vw; aspect-ratio: 5 / 4; max-height: 95vh; display: flex; flex-direction: column; gap: 1.25rem; }
+        /* Адаптация под Full HD (1920x1080) */
+        html, body { 
+            height: 100%;
+            overflow: hidden; 
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #0f1115; 
+            color: #e2e8f0; 
+            margin: 0; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem; 
+        }
+
+        .max-w-custom {
+            width: 100%;
+            max-width: 1800px; /* Растягиваем под 1920 с учетом отступов */
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem; 
+        }
+
         .glass-card { background: rgba(30, 35, 45, 0.7); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 20px; }
         .progress-ring { transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%; }
         .stat-value { background: linear-gradient(180deg, #fff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f1115; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        
         .glow-ring { filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.6)); }
         .glow-orange { filter: drop-shadow(0 0 7px rgba(249, 115, 22, 0.8)); }
-        .vacation-badge { background-color: #2a1f1a; border: 1px solid #7c4a2a; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 160px; height: 125px; }
-        .chart-container { position: relative; width: 100%; height: 380px; display: flex; align-items: center; justify-content: center; }
+
+        .vacation-badge {
+            background-color: #2a1f1a;
+            border: 1px solid #7c4a2a;
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 160px; 
+            height: 125px; 
+        }
+
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            height: 420px; /* Увеличено для 1920 */
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+
         .sector-path { transition: all 0.5s ease-out; cursor: pointer; }
+        .sector-path:hover { filter: brightness(1.3) !important; }
+
+        .chart-label-name { 
+            font-size: 11px; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            fill: white; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8); 
+            pointer-events: none;
+        }
+        
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        
         .calendar-day { font-size: 14px; padding: 4px; text-align: center; border-radius: 6px; }
-        .today { background: #3b82f6; color: white; font-weight: bold; }
-        .weekend { color: #ff3b5c; font-weight: 600; } 
+        
+        .today { background: #3b82f6; color: white; font-weight: bold; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        .weekend { color: #ff3b5c; opacity: 1; font-weight: 600; } 
+
+        table thead th { position: sticky; top: 0; background: #1e232d; z-index: 10; }
         .table-container { flex: 1; overflow-y: hidden; }
+
+        /* Масштабированные шрифты для 1920 */
         .table-header-text { font-size: 14px; } 
         .table-body-text { font-size: 20px; }      
-        .table-cell-padding { padding: 1rem 1.5rem; } 
+        .table-badge-text { font-size: 13px; }     
+        .table-mono-text { font-size: 20px; }      
+        .table-cell-padding { padding: 1.25rem 1.5rem; } 
+
         .manager-name-text { font-size: 18px; }       
         .manager-fact-text { font-size: 32px; }       
+        .manager-comm-label { font-size: 14px; }    
+        .manager-comm-value { font-size: 18px; }    
         .manager-percent-center { font-size: 28px; }  
-        
-        #loader { position: fixed; inset: 0; background: #0f1115; z-index: 100; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
     </style>
 </head>
 <body>
-
-    <div id="loader">
-        <div class="text-xl font-bold animate-pulse text-sky-400">ЗАГРУЗКА ДАННЫХ ИЗ GOOGLE SHEETS...</div>
-    </div>
 
     <div class="max-w-custom mx-auto">
         <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
@@ -91,13 +156,15 @@
             </div>
         </div>
 
+        <!-- КАРТОЧКИ МЕНЕДЖЕРОВ -->
         <div id="managers-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5"></div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full min-h-0">
+            <!-- БЛОК ДЕТАЛИЗАЦИИ -->
             <div class="lg:col-span-2 glass-card overflow-hidden flex flex-col">
                 <div class="px-6 py-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
                     <h3 class="font-semibold text-xl text-white">Детализация по сотрудникам</h3>
-                    <span class="text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-4 py-1.5 rounded text-xs">Рейтинг по факту продаж</span>
+                    <span class="table-badge-text text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-4 py-1.5 rounded">Рейтинг по факту продаж</span>
                 </div>
                 <div class="table-container">
                     <table class="w-full text-left border-collapse">
@@ -116,6 +183,7 @@
                     </table>
                 </div>
             </div>
+
             <div class="glass-card p-6 flex flex-col justify-center">
                 <h3 class="font-semibold text-lg mb-4 text-center text-white">Доля в результате</h3>
                 <div id="radial-chart-box" class="chart-container"></div>
@@ -124,90 +192,49 @@
     </div>
 
     <script>
-        // ВАЖНО: Замените на ваш ID таблицы
-        const SHEET_ID = '1G2iNuRGBnp7PE1L4g81BWJX9B13DlzDcBqHHdvwCmEo'; 
-        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+        const TEAM_PLAN = 2500000; 
+        const CALENDAR = { totalDays: 19, daysLeft: 12 };
+        const passedDays = Math.max(1, CALENDAR.totalDays - CALENDAR.daysLeft);
 
-        let TEAM_PLAN = 0;
-        let CALENDAR = { totalDays: 0, daysLeft: 0 };
-        let dashboardData = [];
-
-        async function fetchData() {
-            try {
-                const response = await fetch(SHEET_URL);
-                if (!response.ok) throw new Error("Не удалось загрузить CSV");
-                
-                const csvText = await response.text();
-                // Фильтруем пустые строки
-                const rows = csvText.split('\n')
-                    .map(row => row.split(','))
-                    .filter(row => row.length > 1);
-                
-                if (rows.length < 2) throw new Error("Таблица пуста или неверно опубликована");
-
-                // Безопасное чтение настроек из первой строки данных (индекс 1)
-                TEAM_PLAN = parseFloat(rows[1][5]) || 0;
-                CALENDAR.totalDays = parseInt(rows[1][6]) || 1;
-                CALENDAR.daysLeft = parseInt(rows[1][7]) || 0;
-
-                // Читаем менеджеров (максимум 6 человек, начиная со строки 1)
-                dashboardData = [];
-                for (let i = 1; i < rows.length && i <= 6; i++) {
-                    const name = (rows[i][0] || "").replace(/"/g, '').trim();
-                    if (name) {
-                        dashboardData.push({
-                            name: name,
-                            plan: parseFloat(rows[i][1]) || 0,
-                            fact: parseFloat(rows[i][2]) || 0,
-                            onVacation: (rows[i][3] || "").trim().toUpperCase() === 'TRUE'
-                        });
-                    }
-                }
-
-                updateUI();
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
-            } catch (e) {
-                console.error("Ошибка загрузки данных:", e);
-                const loaderText = document.querySelector('#loader div');
-                if (loaderText) loaderText.innerText = "Ошибка: проверьте публикацию таблицы и SHEET_ID";
-            }
-        }
+        const dashboardData = [
+            { name: 'Озимук',      plan: 350000, fact: 319000, onVacation: false },
+            { name: 'Крутовская',  plan: 250000, fact: 220000, onVacation: true   }, 
+            { name: 'Паренко',     plan: 250000, fact: 47000,  onVacation: false }, 
+            { name: 'Бабаев',      plan: 250000, fact: 131000, onVacation: false }, 
+            { name: 'Злобин',      plan: 250000, fact: 68000,  onVacation: false }, 
+            { name: 'Остапенко',   plan: 350000, fact: 155000, onVacation: false }
+        ];
 
         const RADIAL_PALETTE = ['#06b6d4', '#10b981', '#0891b2', '#14b8a6', '#0ea5e9', '#4f46e5'];
 
         function initCalendar() {
             const now = new Date();
             const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-            const monthHeader = document.getElementById('current-month');
-            if (monthHeader) monthHeader.innerText = monthNames[now.getMonth()];
-            
+            document.getElementById('current-month').innerText = monthNames[now.getMonth()];
             const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
             const startOffset = firstDay === 0 ? 6 : firstDay - 1;
             const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
             const calendarBody = document.getElementById('calendar-body');
-            
-            if (calendarBody) {
-                calendarBody.innerHTML = '';
-                for (let i = 0; i < startOffset; i++) calendarBody.appendChild(document.createElement('div'));
-                for (let d = 1; d <= daysInMonth; d++) {
-                    const dayEl = document.createElement('div');
-                    dayEl.innerText = d;
-                    const dw = new Date(now.getFullYear(), now.getMonth(), d).getDay();
-                    dayEl.className = `calendar-day ${d === now.getDate() ? 'today' : ''} ${dw === 0 || dw === 6 ? 'weekend' : ''}`;
-                    calendarBody.appendChild(dayEl);
-                }
+            calendarBody.innerHTML = '';
+            for (let i = 0; i < startOffset; i++) calendarBody.appendChild(document.createElement('div'));
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dayEl = document.createElement('div');
+                dayEl.innerText = d;
+                const dw = new Date(now.getFullYear(), now.getMonth(), d).getDay();
+                dayEl.className = `calendar-day ${d === now.getDate() ? 'today' : ''} ${dw === 0 || dw === 6 ? 'weekend' : ''}`;
+                calendarBody.appendChild(dayEl);
             }
         }
 
         function renderRadialChart() {
             const container = document.getElementById('radial-chart-box');
-            if (!container) return;
-            
             const sorted = [...dashboardData].sort((a,b) => b.fact - a.fact);
             const totalFact = sorted.reduce((acc, m) => acc + m.fact, 0);
-            const size = 360; const center = size / 2;
-            const innerRadius = 50; const maxRadius = 180;
+            
+            const size = 400; /* Увеличен размер круговой диаграммы */
+            const center = size / 2;
+            const innerRadius = 60;
+            const maxRadius = 200;
             
             let svgHtml = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="overflow: visible;">`;
             let currentAngle = -Math.PI / 2;
@@ -217,7 +244,7 @@
                 const share = m.fact / totalFact;
                 const angleSpan = share * Math.PI * 2;
                 const midAngle = currentAngle + angleSpan / 2;
-                const currentRadius = innerRadius + (maxRadius - innerRadius) * (m.fact / (sorted[0].fact || 1));
+                const currentRadius = innerRadius + (maxRadius - innerRadius) * (m.fact / sorted[0].fact);
                 const color = RADIAL_PALETTE[i % RADIAL_PALETTE.length];
                 
                 const x1 = center + innerRadius * Math.cos(currentAngle);
@@ -228,87 +255,152 @@
                 const y3 = center + currentRadius * Math.sin(currentAngle + angleSpan);
                 const x4 = center + innerRadius * Math.cos(currentAngle + angleSpan);
                 const y4 = center + innerRadius * Math.sin(currentAngle + angleSpan);
+                
                 const largeArc = angleSpan > Math.PI ? 1 : 0;
                 
-                svgHtml += `<path d="M ${x1} ${y1} L ${x2} ${y2} A ${currentRadius} ${currentRadius} 0 ${largeArc} 1 ${x3} ${y3} L ${x4} ${y4} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x1} ${y1}" fill="${color}" opacity="0.9" stroke="#0f1115" class="sector-path"></path>`;
+                svgHtml += `<path d="M ${x1} ${y1} L ${x2} ${y2} A ${currentRadius} ${currentRadius} 0 ${largeArc} 1 ${x3} ${y3} L ${x4} ${y4} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x1} ${y1}" 
+                                  fill="${color}" opacity="0.9" stroke="#0f1115" stroke-width="1" class="sector-path">
+                                  <title>${m.name}: ${m.fact.toLocaleString()} RUB</title>
+                            </path>`;
                 
-                if (i < 4 && share > 0.05) {
+                if (i < 4) {
                    const labelRadius = innerRadius + (currentRadius - innerRadius) * 0.5;
                    const tx = center + labelRadius * Math.cos(midAngle);
                    const ty = center + labelRadius * Math.sin(midAngle);
                    let rot = (midAngle * 180 / Math.PI) + 90;
                    if (rot > 90 && rot < 270) rot += 180;
-                   svgHtml += `<g transform="translate(${tx}, ${ty}) rotate(${rot})"><text text-anchor="middle" class="chart-label-name" y="3" style="font-size: 10px; fill: white;">${m.name}</text></g>`;
+                   svgHtml += `<g transform="translate(${tx}, ${ty}) rotate(${rot})">
+                                 <text text-anchor="middle" class="chart-label-name" y="3">${m.name}</text>
+                               </g>`;
                 }
                 currentAngle += angleSpan;
             });
-            svgHtml += `<circle cx="${center}" cy="${center}" r="${innerRadius-10}" fill="#161b22" /></svg>`;
+            
+            svgHtml += `<circle cx="${center}" cy="${center}" r="${innerRadius-10}" fill="#161b22" />`;
+            svgHtml += `</svg>`;
             container.innerHTML = svgHtml;
         }
 
         function updateUI() {
             initCalendar();
+            
             const totalFactTeam = dashboardData.reduce((acc, m) => acc + m.fact, 0);
-            const passedDays = Math.max(1, CALENDAR.totalDays - CALENDAR.daysLeft);
             const teamPlanAchieved = totalFactTeam >= TEAM_PLAN;
 
             const grid = document.getElementById('managers-grid');
-            if (grid) {
-                grid.innerHTML = '';
-                dashboardData.forEach(m => {
-                    const percent = m.plan > 0 ? Math.round((m.fact / m.plan) * 100) : 0;
-                    let commissionRate = 8, commissionColor = "text-slate-300", ringGlow = "text-sky-500", ringStroke = "currentColor";
-                    if (!m.onVacation) {
-                        if (percent >= 150 && teamPlanAchieved) { 
-                            commissionRate = 11; commissionColor = "text-orange-500 font-bold"; ringGlow = "text-orange-500 glow-orange"; ringStroke = "#f97316"; 
-                        } else if (percent >= 100) { 
-                            commissionRate = 10; commissionColor = "text-emerald-400 font-bold"; ringGlow = "text-emerald-400 glow-ring"; 
-                        } else { 
-                            commissionRate = 8; commissionColor = "text-sky-400"; 
-                        }
+            grid.innerHTML = '';
+            dashboardData.forEach(m => {
+                const percent = m.plan > 0 ? Math.round((m.fact / m.plan) * 100) : 0;
+                let commissionRate = 8;
+                let commissionColor = "text-slate-300";
+                let ringGlowClass = "text-sky-500";
+                let ringStroke = "currentColor";
+                
+                if (!m.onVacation) {
+                    if (percent >= 150 && teamPlanAchieved) {
+                        commissionRate = 11;
+                        commissionColor = "text-orange-500 font-bold";
+                        ringGlowClass = "text-orange-500 glow-orange";
+                        ringStroke = "#f97316";
+                    } else if (percent >= 100) {
+                        commissionRate = 10;
+                        commissionColor = "text-emerald-400 font-bold";
+                        ringGlowClass = "text-emerald-400 glow-ring";
+                        ringStroke = "currentColor";
+                    } else {
+                        commissionRate = 8;
+                        commissionColor = "text-sky-400";
+                        ringGlowClass = "text-sky-500";
+                        ringStroke = "currentColor";
                     }
-                    const card = document.createElement('div');
-                    card.className = 'glass-card p-6 flex flex-col items-center text-center';
-                    card.innerHTML = m.onVacation ? `
-                        <div class="vacation-badge mb-5"><span class="text-[#7c4a2a] text-[13px] font-bold uppercase mb-1">Статус</span><span class="text-[#d97706] text-3xl font-black uppercase leading-none">Отпуск</span><span class="text-[#d97706] text-4xl font-black mt-2">8%</span></div>
-                        <div class="manager-name-text font-bold text-slate-300 uppercase mb-1">${m.name}</div><div class="manager-fact-text font-black text-white">${(m.fact / 1000).toFixed(0)}к</div>
-                    ` : `
-                        <div class="relative mb-5 flex items-center justify-center"><svg width="140" height="140"><circle class="text-slate-800" stroke-width="10" stroke="currentColor" fill="transparent" r="62" cx="70" cy="70"/><circle class="progress-ring ${ringGlow}" stroke-width="10" stroke-dasharray="389" stroke-dashoffset="${389 - (Math.min(percent, 100)/100)*389}" stroke-linecap="round" stroke="${ringStroke}" fill="transparent" r="62" cx="70" cy="70"/></svg><span class="absolute manager-percent-center font-extrabold text-white">${percent}%</span></div>
-                        <div class="manager-name-text font-bold text-slate-300 uppercase mb-1">${m.name}</div><div class="manager-fact-text font-black text-white">${(m.fact / 1000).toFixed(0)}к</div>
-                        <div class="mt-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10"><span class="text-slate-400 mr-1 text-xs uppercase">%:</span><span class="${commissionColor}">${commissionRate}%</span></div>
-                    `;
-                    grid.appendChild(card);
-                });
-            }
+                }
+
+                const card = document.createElement('div');
+                card.className = 'glass-card p-6 flex flex-col items-center text-center hover:scale-[1.02] transition-transform';
+                
+                let mainGraphic = m.onVacation ? `
+                    <div class="vacation-badge mb-5">
+                        <span class="text-[#7c4a2a] text-[13px] font-bold uppercase mb-1">Статус</span>
+                        <span class="text-[#d97706] text-3xl font-black uppercase leading-none">Отпуск</span>
+                        <span class="text-[#d97706] text-4xl font-black mt-2">8%</span>
+                    </div>
+                ` : `
+                    <div class="relative mb-5 flex items-center justify-center">
+                        <svg width="140" height="140"><circle class="text-slate-800" stroke-width="10" stroke="currentColor" fill="transparent" r="62" cx="70" cy="70"/>
+                        <circle class="progress-ring ${ringGlowClass}" stroke-width="10" stroke-dasharray="389" stroke-dashoffset="${389 - (Math.min(percent, 100)/100)*389}" stroke-linecap="round" stroke="${ringStroke}" fill="transparent" r="62" cx="70" cy="70"/></svg>
+                        <span class="absolute manager-percent-center font-extrabold text-white">${percent}%</span>
+                    </div>
+                `;
+                
+                const commissionSlot = m.onVacation ? 
+                    `<div class="mt-1 h-[30px] w-full"></div>` : 
+                    `<div class="mt-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10">
+                        <span class="manager-comm-label uppercase text-slate-400 mr-1">% от продаж:</span>
+                        <span class="manager-comm-value ${commissionColor}">${commissionRate}%</span>
+                    </div>`;
+
+                card.innerHTML = `
+                    ${mainGraphic}
+                    <div class="manager-name-text font-bold text-slate-300 uppercase mb-1 tracking-wide">${m.name}</div>
+                    <div class="manager-fact-text font-black text-white">${(m.fact / 1000).toFixed(0)}к</div>
+                    ${commissionSlot}
+                `;
+                grid.appendChild(card);
+            });
 
             const tableBody = document.getElementById('table-body');
-            if (tableBody) {
-                tableBody.innerHTML = '';
-                let displayIndex = 1;
-                [...dashboardData].sort((a,b) => b.fact-a.fact).forEach((m) => {
-                    const percent = m.plan > 0 ? Math.round((m.fact / m.plan) * 100) : 0;
-                    const rem = m.plan - m.fact;
-                    const pd = Math.round(m.plan / (CALENDAR.totalDays || 1));
-                    const fd = Math.round(m.fact / passedDays);
-                    const row = document.createElement('tr');
-                    row.className = `border-b border-white/5 hover:bg-white/5 transition-colors`;
-                    row.innerHTML = `<td class="table-cell-padding text-center font-mono text-slate-500">${displayIndex++}</td><td class="table-cell-padding font-semibold text-slate-100">${m.name}</td><td class="table-cell-padding text-right text-slate-300 font-mono">${m.plan.toLocaleString()}</td><td class="table-cell-padding text-right text-slate-400 font-mono">${pd.toLocaleString()}</td><td class="table-cell-padding text-right ${fd < pd ? 'text-sky-400' : 'text-emerald-400'} font-bold">${fd.toLocaleString()}</td><td class="table-cell-padding text-right"><div class="font-bold ${percent >= 100 ? 'text-emerald-400' : 'text-white'}">${m.fact.toLocaleString()}</div><div class="w-full h-1.5 bg-slate-800 rounded-full mt-2 overflow-hidden"><div class="h-full bg-emerald-500" style="width: ${Math.min(percent, 100)}%"></div></div></td><td class="table-cell-padding text-right font-mono">${rem <= 0 ? `<div class="text-emerald-400 font-bold">ВЫПОЛНЕНО</div>` : `<span class="text-slate-300">${rem.toLocaleString()}</span>`}</td>`;
-                    tableBody.appendChild(row);
-                });
-            }
+            tableBody.innerHTML = '';
+            let totalFactSum = 0;
+            let displayIndex = 1; 
+            
+            [...dashboardData].sort((a,b) => b.fact-a.fact).forEach((m) => {
+                if (m.onVacation && m.name === 'Крутовская') {
+                    totalFactSum += m.fact; 
+                    return;
+                }
 
-            const totalPercent = TEAM_PLAN > 0 ? Math.round((totalFactTeam / TEAM_PLAN) * 100) : 0;
+                const percent = m.plan > 0 ? Math.round((m.fact / m.plan) * 100) : 0;
+                const rem = m.plan - m.fact;
+                const pd = m.plan > 0 ? Math.round(m.plan / CALENDAR.totalDays) : 0;
+                const fd = Math.round(m.fact / passedDays);
+                
+                const row = document.createElement('tr');
+                row.className = `border-b border-white/5 hover:bg-white/5 transition-colors`;
+                
+                row.innerHTML = `
+                    <td class="table-cell-padding text-center font-mono text-slate-500">${displayIndex++}</td>
+                    <td class="table-cell-padding font-semibold text-slate-100">${m.name}</td>
+                    <td class="table-cell-padding text-right text-slate-300 font-mono">${m.plan.toLocaleString()}</td>
+                    <td class="table-cell-padding text-right text-slate-400 font-mono">${pd.toLocaleString()}</td>
+                    <td class="table-cell-padding text-right ${fd < pd ? 'text-sky-400' : 'text-emerald-400'} font-bold">${fd.toLocaleString()}</td>
+                    <td class="table-cell-padding text-right">
+                        <div class="font-bold ${percent >= 100 ? 'text-emerald-400' : 'text-white'}">${m.fact.toLocaleString()}</div>
+                        <div class="w-full h-1.5 bg-slate-800 rounded-full mt-2 overflow-hidden"><div class="h-full bg-emerald-500" style="width: ${Math.min(percent, 100)}%"></div></div>
+                    </td>
+                    <td class="table-cell-padding text-right font-mono table-mono-text">
+                        ${rem <= 0 ? 
+                            `<div class="text-emerald-400 font-bold brightness-125 leading-tight text-[20px]">ВЫПОЛНЕНО</div>
+                             <div class="text-emerald-400/60 text-[18px] mt-0.5">(+${Math.abs(rem).toLocaleString()})</div>` : 
+                            `<span class="text-slate-300">${rem.toLocaleString()}</span>`
+                        }
+                    </td>
+                `;
+                tableBody.appendChild(row);
+                totalFactSum += m.fact;
+            });
+
+            const totalPercent = Math.round((totalFactSum / TEAM_PLAN) * 100);
             document.getElementById('header-total-plan').innerText = (TEAM_PLAN / 1000000).toFixed(1) + 'M';
-            document.getElementById('header-total-fact').innerText = (totalFactTeam / 1000000).toFixed(1) + 'M';
+            document.getElementById('header-total-fact').innerText = (totalFactSum / 1000000).toFixed(1) + 'M';
             document.getElementById('header-total-percent').innerText = totalPercent + '%';
             document.getElementById('header-plan-label').innerText = (TEAM_PLAN / 1000000).toFixed(1) + 'M';
-            document.getElementById('header-progress-bar').style.width = Math.min(totalPercent, 100) + '%';
+            setTimeout(() => { document.getElementById('header-progress-bar').style.width = Math.min(totalPercent, 100) + '%'; }, 100);
             document.getElementById('days-total').innerText = CALENDAR.totalDays;
             document.getElementById('days-left').innerText = CALENDAR.daysLeft;
             renderRadialChart();
         }
 
-        window.onload = fetchData;
+        window.addEventListener('load', () => setTimeout(updateUI, 300));
     </script>
 </body>
 </html>
